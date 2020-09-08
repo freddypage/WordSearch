@@ -15,3 +15,6 @@ My project combines both state and Redux props to make a functioning, cohesive g
 Tap individual letters to make a selection. Words that are found will appear green in the word bank. Once all words are found, you win!
 Press New game to generate a board.
 The dictionary used and the size of the board can be modified (in Board.js). Since this was meant to be a quick project, the functionality may be a little buggy
+
+## Screenshot
+![Screenshot](src/images/Screenshot.jpg)

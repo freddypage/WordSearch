@@ -78,15 +78,15 @@ class Board extends Component {
         //arrangeLetters
         console.log('arranging letters: '+pool+'\n')
         var tries = 0;
-        var arrangmentFound = false
+        var arrangementFound = false
 
         //try to make a board at least 10 times
         do{
             matrix = this.createEmptyMatrix(length)
-            arrangmentFound = this.arrangeLetters(matrix, pool)
+            arrangementFound = this.arrangeLetters(matrix, pool)
             console.log('\n'+'try number: '+ (++tries))
 
-        }while(!arrangmentFound && tries<10)
+        }while(!arrangementFound && tries<10)
 
         //addtobank
         for(var i = 0; i<pool.length; i++)
@@ -157,6 +157,8 @@ class Board extends Component {
                 return false;
             }
         }
+
+        return true
     }
 
     //try position of word
