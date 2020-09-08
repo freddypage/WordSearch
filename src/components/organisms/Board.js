@@ -14,47 +14,84 @@ class Board extends Component {
     matrix = [];
     color_matrix = [];
     letters = [];
+    dictionary = [
+        'amusing','reward','annoying','tiny','spill','befitting','faint','uninterested',
+        'known','interrupt','redundant','bustling','thoughtful','aunt','comparison',
+        'friend','juice','intern','brother'
+    ]
 
     componentDidMount() {
-        this.makeBoard(10,['friend', 'juice', 'crab']);
+        this.makeBoard(10,this.getRandomWords(3));
         //console.log(this.matrix)
         this.letters = this.renderLetters();
         this.setState({isLoading:false});
+    }
+
+    getRandomWords(numWords)
+    {
+        if(!numWords || typeof(numWords) !== "number") return []
+        var list = [];
+        var buffer = 0;
+        while(list.length<numWords && buffer<100)
+        {
+            var randWord = this.dictionary[this.getRandomInt(this.dictionary.length)]
+            if(!list.includes(randWord))
+            {
+                list.push(randWord)
+            }
+            buffer++;
+        }
+        console.log(list)
+        return list
+    }
+
+    componentDidUpdate(prev)
+    {
+        if(prev.iteration!=this.props.iteration && this.props.iteration > 0)
+        {
+            this.letters = null
+            this.matrix = [];
+            this.color_matrix = [];
+            this.setState({isLoading:true})
+            this.makeBoard(10,this.getRandomWords(5));
+            this.letters = this.renderLetters()
+            this.setState({isLoading:false})
+        }
     }
 
    
 
     makeBoard(length, add_words) {
         //min length of board must be largest word in pool
-        
-        pool = this.base_words.concat(add_words);
+        if(add_words) pool = this.base_words.concat(add_words);
 
-        //get max and make lower case
-        var max = 0;
+        // make lower case
         pool.forEach(function(element, index, arr) {
             arr[index] = element.toLowerCase();
-            if(max<element.length)
-            {
-                max = element.length;
-            }
         });
-        length = Math.max(length, max);
+        //filter words that are too large
+        pool = pool.filter(word => word.length < length);
 
-
-        //create empty matrix
-        var matrix = [];
-        for(var i = 0; i<length; i++)
-        {
-            matrix[i] = new Array(length);
-            this.color_matrix[i] = new Array(length);
-        }
-
-
+        //initialize matrix
+        var matrix;
         
         //arrangeLetters
-        if(this.arrangeLetters(matrix, pool))
+        console.log('arranging letters: '+pool+'\n')
+        var tries = 0;
+        var arrangmentFound = false
+
+        //try to make a board at least 10 times
+        do{
+            matrix = this.createEmptyMatrix(length)
+            arrangmentFound = this.arrangeLetters(matrix, pool)
+            console.log('\n'+'try number: '+ (++tries))
+
+        }while(!arrangmentFound && tries<10)
+
+        //addtobank
+        for(var i = 0; i<pool.length; i++)
         {
-            throw 'Arrangement does not work';
+            this.addToWordBank(pool[i])
         }
 
         //fillMatrix
@@ -75,6 +112,22 @@ class Board extends Component {
         return Math.floor(Math.random() * Math.floor(max));
     }
 
+    addToWordBank(word)
+    {
+        this.props.dispatch({type:'ADD_TO_BANK', word:word})
+    }
+
+    createEmptyMatrix(length)
+    {
+        var matrix = [];
+        for(var i = 0; i<length; i++)
+        {
+            matrix[i] = new Array(length);
+            this.color_matrix[i] = new Array(length);
+        }
+        return matrix
+    }
+
     //takes a matrix and a pool of strings and arranges characters in matrix
     arrangeLetters(matrix, pool)
     {
@@ -84,7 +137,8 @@ class Board extends Component {
             //console.log(word+' '+arrangement);
             var tries = 0;
             var actualPos = [];
-            while(tries<100)
+
+            while((tries<100) && actualPos.length<1)
             {
                 var arrangement = this.arrangements[this.getRandomInt(this.arrangements.length)];
                 var pos = this.getPosition(matrix.length, word.length, arrangement);
@@ -92,13 +146,12 @@ class Board extends Component {
                 {
                     actualPos = pos;
                     console.log(word+' '+pos+' '+arrangement)
-                    this.props.dispatch({type:'ADD_TO_BANK',word:word});
-                    tries = 100;
                     break;
                 }
                 tries++;
             }
-            if(!actualPos)
+
+            if(actualPos.length<1)
             {
                 console.log(word+' '+'did not work')
                 return false;
@@ -110,6 +163,7 @@ class Board extends Component {
     //returns true if works (and adds to matrix)
     tryPos(pos, word, arrangement, matrix)
     {
+        //confusing but x and y should be reversed here..
         var x = pos[0];
         var y = pos[1];
         switch(arrangement)
@@ -117,15 +171,15 @@ class Board extends Component {
             case 'top':
                 for(var i = 0; i<word.length; i++)
                 {
-                    if(matrix[x][y+i]!==undefined && matrix[x][y+i]!=word[i])
+                    if(matrix[y+i ][x]!==undefined && matrix[y+i][x]!=word[i])
                     {
                         return false;
                     }
                 }
                 for(var i = 0; i<word.length; i++)
                 {
-                    matrix[x][y+i]=word[i];
-                    this.color_matrix[x][y+i]=true;
+                    matrix[y+i][x]=word[i];
+                    this.color_matrix[y+i][x]=true;
                 }
                 break;
             case 'top-diagonal':
@@ -145,30 +199,31 @@ class Board extends Component {
             case 'sideways':
                 for(var i = 0; i<word.length; i++)
                 {
-                    if(matrix[x+i][y]!==undefined && matrix[x+i][y]!=word[i])
+                    if(matrix[y][x+i]!==undefined && matrix[y][x+i]!=word[i])
                     {
                         return false;
                     }
                 }
                 for(var i = 0; i<word.length; i++)
                 {
-                    matrix[x+i][y]=word[i];
-                    this.color_matrix[x+i][y]=true;
+                    matrix[y][x+i]=word[i];
+                    this.color_matrix[y][x+i]=true;
                     
                 }
                 break;
             case 'bottom-diagonal':
+                
                 for(var i = 0; i<word.length; i++)
                 {
-                    if(matrix[x+i][y-i]!==undefined && matrix[x+i][y-i]!=word[i])
+                    if(matrix[x-i][y+i]!==undefined && matrix[x-i][y+i]!=word[i])
                     {
                         return false;
                     }
                 }
                 for(var i = 0; i<word.length; i++)
                 {
-                    matrix[x+i][y-i]=word[i];
-                    this.color_matrix[x+i][y-i]=true;
+                    matrix[x-i][y+i]=word[i];
+                    this.color_matrix[x-i][y+i]=true;
                 }
                 break;
                 
@@ -197,8 +252,8 @@ class Board extends Component {
                 y = this.getRandomInt(matrixLength-1);
                 break;
             case 'bottom-diagonal':
-                x = this.getRandomInt(matrixLength-wordLength-1);
-                y = this.getRandomInt(matrixLength-1, matrixLength-wordLength-1);
+                y = this.getRandomInt(matrixLength-wordLength-1);
+                x = this.getRandomInt(matrixLength-1, wordLength-1);
                 break;
                 
         }
@@ -211,7 +266,8 @@ class Board extends Component {
         this.state = {
             isLoading: true,
             modalVisible: false,
-            length:10
+            length:10,
+            isNew:false
         }
     }
 
@@ -255,7 +311,10 @@ class Board extends Component {
         {
             for(var j = 0; j<matrix[0].length; j++)
             {
-                if(matrix[i][j]===undefined) matrix[i][j] = characters.charAt(this.getRandomInt(characters.length));
+                if(matrix[i][j]===undefined) {
+                    matrix[i][j] = characters.charAt(this.getRandomInt(characters.length));
+                    this.color_matrix[i][j] = false;
+                }
             }
         }
     }

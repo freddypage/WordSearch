@@ -1,12 +1,11 @@
 import { StyleSheet } from 'react-native';
 import {Dimensions} from 'react-native';
+import Constants from 'expo-constants';
 
 const styles = StyleSheet.create({
     container: {
-        marginTop: 20,
-        padding: 10,
-        width:'100%',
-        height:Dimensions.get('window').height
+        flex: 1,
+        marginTop: Constants.statusBarHeight
     },
     header:{
         fontFamily:"OpenSans-Regular",
@@ -53,7 +52,7 @@ const styles = StyleSheet.create({
           display:'flex',
           flexWrap:'wrap',
           flexDirection:'row',
-          padding:10
+          padding:10,
       },
       character: {
         fontFamily:"OpenSans-Regular",
@@ -72,20 +71,68 @@ const styles = StyleSheet.create({
           overflow:"visible"
       },
       wordBank: {
-          height:100,
           width:'100%',
           display:"flex",
           justifyContent:"flex-start",
           flexDirection:"row",
           flexWrap:'wrap',
-          alignContent:'flex-start'
+          alignContent:'flex-start',
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.8,
+          shadowRadius: 2,
+          borderWidth: 1,
+          alignSelf:'center',
+        borderRadius: 2,
+        borderColor: '#ddd',
+        elevation:2,
+        overflow:"visible",
+        marginTop:20,
+        marginBottom:20,
+        marginLeft:30,
+        marginRight: 30
       },
       wordDisplay:
       {
         display:'flex',
         flexWrap:'wrap',
-        flexDirection:'row'
-      }
+        flexDirection:'row',
+        marginBottom:10
+      },
+      modalView: {
+        margin: 20,
+        backgroundColor: "white",
+        borderRadius: 20,
+        padding: 35,
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: {
+          width: 0,
+          height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5
+      },
+      modal: {
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+        minHeight: Dimensions.get('window').height
+    },
+    openButton: {
+        borderRadius: 20,
+        padding: 5,
+        elevation: 2,
+        width:145
+      },
+      textStyle: {
+        color: "black",
+        textAlign: "left",
+        fontFamily:"OpenSans-Regular",
+        fontSize:15,
+        paddingLeft:5,
+        paddingRight:5,
+        paddingBottom:20
+      },
 });
 
 const buttons = StyleSheet.create({

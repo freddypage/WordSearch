@@ -19,7 +19,7 @@ class WordBank extends Component {
 
     componentDidUpdate(prev)
     {
-        if(this.props.wordBank && prev.wordBank.length!=this.props.wordBank.length&&this.props.wordBank.length>=1)
+        if(this.props.wordBank && prev.wordBank.length!=this.props.wordBank.length)
         {
             var wordBank = this.props.wordBank;
             this.words = wordBank.map((w, index) => {
@@ -45,9 +45,6 @@ class WordBank extends Component {
 
         return(
             <View>
-                <View>
-                    <Text style={[styles.h2, styles.centered]}>Word Bank:</Text>
-                </View>
                 <View style={[styles.wordBank]}>
                         {isLoading? <ActivityIndicator/> : this.words}
                 </View>

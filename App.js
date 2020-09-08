@@ -1,29 +1,35 @@
-import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { Text, View } from 'react-native';
-import Board from 'organisms/Board';
 import {useFonts} from 'expo-font';
 import { AppLoading } from 'expo';
-import {styles} from 'styles/style';
 import {createStore} from 'redux';
 import { Provider } from 'react-redux';
-import WordDisplay from 'atoms/WordDisplay';
-import BankEntry from 'molecules/WordBank';
+import Game from 'organisms/Game'
+import { ScrollView } from 'react-native-gesture-handler';
+import {styles} from 'styles/style';
 
 export default function App() {
 
   const initialState = {
     selection:"",
-    wordBank: new Array()
+    wordBank: new Array(),
+    reset: false
   }
   
   const reducer = (state = initialState, action) => {
     //console.log('reducer', state, action);
     switch(action.type) {
+      case 'NEW_GAME':
+        return {
+          wordBank: new Array(),
+          selection: "",
+          latest_find: "",
+          reset: true
+        }
       case 'ADD_LETTER':
         return {
           wordBank: [...state.wordBank],
-          selection : state.selection + action.letter
+          selection : state.selection + action.letter,
+          reset: false
         };
       case 'REMOVE_LETTER':
         var str = state.selection
@@ -37,7 +43,8 @@ export default function App() {
         }
         return {
           wordBank: [...state.wordBank],
-          selection: str
+          selection: str,
+          reset: false
         }
       case 'CLEAR_SELECTION':
         console.log(state)
@@ -51,10 +58,14 @@ export default function App() {
               state.wordBank.splice(i,1)
             }
           }
+
+          var gameWon = state.wordBank.length == 0
           return {
             latest_find:action.latest_find,
             wordBank: [...state.wordBank],
-            selection: ""
+            selection: "",
+            reset: false,
+            isDone: gameWon
           };
         }
         else
@@ -62,14 +73,16 @@ export default function App() {
           console.log('cleared segment ');
           return {
             wordBank: [...state.wordBank],
-            selection: ""
+            selection: "",
+            reset: false
           };
         }
         
       case 'ADD_TO_BANK':
         return {
           wordBank: [...state.wordBank, action.word],
-          selection: state.selection
+          selection: state.selection,
+          reset: false
         }
       default:
         return state;
@@ -89,13 +102,9 @@ export default function App() {
 
   return (
     <Provider store={store}>
-      <View style={[styles.container, styles.centered]}>
-        <Text style={[styles.header,styles.header]}>Word Search</Text>
-        <WordDisplay selection=""></WordDisplay>
-        <Board></Board>
-        <BankEntry/>
-        <StatusBar style="auto" />
-      </View>
+      <ScrollView style={[styles.container]}>
+        <Game/>
+      </ScrollView>
     </Provider>
   );
 }

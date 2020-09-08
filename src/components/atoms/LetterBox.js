@@ -12,10 +12,10 @@ class LetterBox extends Component {
 
     constructor(props) {
         super(props);
-        if(this.props.color)
-        {
-            this.base_background = this.colors[this.getRandomInt(this.colors.length)];
-        }
+        // if(this.props.color)
+        // {
+        //     this.base_background = this.colors[this.getRandomInt(this.colors.length)];
+        // }
         this.state = {
             background: this.base_background,
             selected:false,
@@ -28,17 +28,31 @@ class LetterBox extends Component {
    
     componentDidUpdate(prev)
     {
-        if(prev.selection!=this.props.selection)
+        if(prev.selection!=this.props.selection&&this.state.selected==true)
         {
-            if(prev.selection==this.props.latest_find&&this.state.selected==true)
+            //console.log(this.props.selection+' from letter  -  '+this.props.character)
+            if(this.props.selection.length<1)
             {
+                //console.log(this.props.latest_find)
+                // console.log('prev: '+prev.selection)
+                // console.log('cur : '+this.props.selection)
                 this.base_background = '#aeff5c';
                 this.setState({selected:false, background:this.base_background});
             }
-            else if(this.props.selection.length<1 && this.state.selected==true)
-            {
+        }
+
+        if(prev.character!=this.props.character)
+        {
+            // if(this.props.color)
+            // {
+            //     this.base_background = this.colors[this.getRandomInt(this.colors.length)];
+            //     this.setState({selected:false, background:this.base_background});
+            // }
+            // else
+            // {
+                this.base_background = '#ffffff';
                 this.setState({selected:false, background:this.base_background});
-            }
+            //}
         }
     }
 
@@ -84,7 +98,7 @@ class LetterBox extends Component {
             onMoveShouldSetResponder={() => false}
             onMoveShouldSetResponderCapture={() => false}
             onResponderGrant={(event) => {
-                console.log('CHILD: letter responder granted '+this.state.key);
+                //console.log('CHILD: letter responder granted '+this.state.key);
                 locX = event.nativeEvent.locationX;
                 locY = event.nativeEvent.locationY;
                 this.handlePress()

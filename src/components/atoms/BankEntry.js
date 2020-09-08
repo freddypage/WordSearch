@@ -27,7 +27,7 @@ class BankEntry extends Component {
 
         return(
             <View style={[styles.bankEntry]}>
-                    <Text style={this.state.hasLineThrough ? bankLoc.lineThrough : bankLoc.plain }>{this.props.word}</Text>
+                    <Text style={this.state.hasLineThrough ? bankLoc.lineThrough : bankLoc.plain }>{this.props.word} </Text>
             </View>
         );
     } 
