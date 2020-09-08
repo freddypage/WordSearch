@@ -17,4 +17,4 @@ Press New game to generate a board.
 The dictionary used and the size of the board can be modified (in Board.js). Since this was meant to be a quick project, the functionality may be a little buggy
 
 ## Screenshot
-![Screenshot](src/images/Screenshot.jpg  {width=40px height=400px})
+![Screenshot](src/images/Screenshot.jpg)
